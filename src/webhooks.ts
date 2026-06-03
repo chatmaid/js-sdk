@@ -129,6 +129,9 @@ function isWebhookEvent(value: unknown): value is WebhookEvent {
   return (
     v.event === "message.sent" ||
     v.event === "message.failed" ||
+    v.event === "message.received" ||
+    v.event === "message.delivered" ||
+    v.event === "message.read" ||
     v.event === "phone.connected" ||
     v.event === "phone.disconnected"
   );

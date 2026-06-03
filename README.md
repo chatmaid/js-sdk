@@ -59,6 +59,22 @@ for await (const m of cm.messages.iterate({ status: "sent" })) {
 }
 ```
 
+## Inbound messages
+
+Messages received by your connected phone numbers (live environment only):
+
+```ts
+const inbound = await cm.messages.getInbound("inmsg_abc123");
+
+const page = await cm.messages.listInbound({ limit: 50 });
+
+for await (const m of cm.messages.iterateInbound()) {
+  // auto-paginates
+}
+```
+
+For real-time delivery, subscribe to the `message.received` webhook event instead of polling.
+
 ## Phone numbers and account
 
 ```ts
@@ -83,10 +99,17 @@ app.post("/webhooks/chatmaid", express.raw({ type: "application/json" }), (req, 
 
     switch (event.event) {
       case "message.sent":
-        // event.data: { id, from, to, status, ... }
+        // event.data: { messageId, from, to, status, ... }
         break;
       case "message.failed":
         // event.data includes errorCode, errorMessage
+        break;
+      case "message.received":
+        // inbound message: event.data: { messageId, from, to, content, type, ... }
+        break;
+      case "message.delivered":
+      case "message.read":
+        // delivery receipts for messages you sent
         break;
       case "phone.connected":
       case "phone.disconnected":

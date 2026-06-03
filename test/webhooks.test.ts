@@ -21,12 +21,14 @@ describe("verifyWebhook", () => {
       event: "message.sent",
       timestamp: new Date(now * 1000).toISOString(),
       data: {
-        id: "msg_1",
+        messageId: "msg_1",
         from: "+1",
         to: "+2",
-        content: "hi",
-        mediaUrls: [],
         status: "sent",
+        sentAt: new Date(now * 1000).toISOString(),
+        deliveredAt: null,
+        readAt: null,
+        failedAt: null,
       },
     });
     const event = verifyWebhook({
@@ -37,7 +39,63 @@ describe("verifyWebhook", () => {
     });
     expect(event.event).toBe("message.sent");
     if (event.event === "message.sent") {
-      expect(event.data.id).toBe("msg_1");
+      expect(event.data.messageId).toBe("msg_1");
+    }
+  });
+
+  it("accepts a message.received event", () => {
+    const now = 1_700_000_000;
+    const body = JSON.stringify({
+      event: "message.received",
+      timestamp: new Date(now * 1000).toISOString(),
+      data: {
+        messageId: "inmsg_1",
+        from: "+2",
+        to: "+1",
+        content: "hello",
+        type: "text",
+        isGroup: false,
+        groupId: null,
+        receivedAt: new Date(now * 1000).toISOString(),
+      },
+    });
+    const event = verifyWebhook({
+      body,
+      signature: sign(body, now),
+      secret: SECRET,
+      now: () => now * 1000,
+    });
+    expect(event.event).toBe("message.received");
+    if (event.event === "message.received") {
+      expect(event.data.content).toBe("hello");
+      expect(event.data.type).toBe("text");
+    }
+  });
+
+  it("accepts message.delivered and message.read events", () => {
+    const now = 1_700_000_000;
+    for (const eventType of ["message.delivered", "message.read"] as const) {
+      const body = JSON.stringify({
+        event: eventType,
+        timestamp: new Date(now * 1000).toISOString(),
+        data: {
+          messageId: "msg_1",
+          from: "+1",
+          to: "+2",
+          status: eventType === "message.read" ? "read" : "delivered",
+          sentAt: new Date(now * 1000).toISOString(),
+          deliveredAt: new Date(now * 1000).toISOString(),
+          readAt: eventType === "message.read" ? new Date(now * 1000).toISOString() : null,
+          failedAt: null,
+        },
+      });
+      const event = verifyWebhook({
+        body,
+        signature: sign(body, now),
+        secret: SECRET,
+        now: () => now * 1000,
+      });
+      expect(event.event).toBe(eventType);
     }
   });
 
@@ -46,9 +104,9 @@ describe("verifyWebhook", () => {
     const body = JSON.stringify({
       event: "message.sent",
       timestamp: "x",
-      data: { id: "a", from: "+1", to: "+2", content: null, mediaUrls: [], status: "sent" },
+      data: { messageId: "a", from: "+1", to: "+2", status: "sent" },
     });
-    const tampered = body.replace('"id":"a"', '"id":"b"');
+    const tampered = body.replace('"messageId":"a"', '"messageId":"b"');
     expect(() =>
       verifyWebhook({
         body: tampered,

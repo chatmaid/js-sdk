@@ -1,7 +1,10 @@
 import type { HttpClient } from "../http.js";
 import type {
+  InboundMessage,
+  ListInboundMessagesParams,
   ListMessagesParams,
   Message,
+  PaginatedInboundMessages,
   PaginatedMessages,
   SendMessageParams,
 } from "../types.js";
@@ -89,6 +92,58 @@ export class MessagesResource {
     const limit = params.limit ?? 50;
     while (true) {
       const result = await this.list({ ...params, page, limit });
+      for (const message of result.data) yield message;
+      if (page >= result.pagination.totalPages) return;
+      page += 1;
+    }
+  }
+
+  async getInbound(messageId: string): Promise<InboundMessage> {
+    if (!messageId) {
+      throw new TypeError("messages.getInbound: messageId is required");
+    }
+    const { data } = await this.http.request<InboundMessage>({
+      method: "GET",
+      path: `/messages/inbound/${encodeURIComponent(messageId)}`,
+    });
+    return data;
+  }
+
+  async listInbound(
+    params: ListInboundMessagesParams = {},
+  ): Promise<PaginatedInboundMessages> {
+    // Backend wraps paginated payloads as { success, data: { data, pagination } }
+    // so the inner `data` arrives here as the unwrapped envelope body.
+    const { data: payload } = await this.http.request<{
+      data: InboundMessage[];
+      pagination: PaginatedInboundMessages["pagination"];
+    }>({
+      method: "GET",
+      path: "/messages/inbound",
+      query: {
+        phoneNumberId: params.phoneNumberId,
+        page: params.page,
+        limit: params.limit,
+      },
+    });
+    return {
+      data: payload.data,
+      pagination: payload.pagination ?? {
+        page: params.page ?? 1,
+        limit: params.limit ?? payload.data.length,
+        total: payload.data.length,
+        totalPages: 1,
+      },
+    };
+  }
+
+  async *iterateInbound(
+    params: Omit<ListInboundMessagesParams, "page"> = {},
+  ): AsyncIterableIterator<InboundMessage> {
+    let page = 1;
+    const limit = params.limit ?? 50;
+    while (true) {
+      const result = await this.listInbound({ ...params, page, limit });
       for (const message of result.data) yield message;
       if (page >= result.pagination.totalPages) return;
       page += 1;

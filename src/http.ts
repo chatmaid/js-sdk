@@ -50,7 +50,7 @@ export class HttpClient {
         "Chatmaid SDK: global fetch is not available. Pass a fetch implementation via the `fetch` option.",
       );
     }
-    this.userAgent = opts.userAgent ?? "chatmaid-sdk-js/0.1.0";
+    this.userAgent = opts.userAgent ?? "chatmaid-sdk-js/0.3.0";
     this.timeoutMs = opts.timeoutMs ?? DEFAULT_TIMEOUT_MS;
     this.maxRetries = opts.maxRetries ?? DEFAULT_MAX_RETRIES;
   }

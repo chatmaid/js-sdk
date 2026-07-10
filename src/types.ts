@@ -11,6 +11,10 @@ export interface Message {
   id: string;
   from: string;
   to: string;
+  /** True when the recipient is a WhatsApp group. */
+  isGroup: boolean;
+  /** Full group JID (…@g.us) when isGroup is true. */
+  groupId: string | null;
   content: string | null;
   mediaUrls: string[];
   status: MessageStatus;
@@ -49,10 +53,28 @@ export interface InboundMessage {
 
 export interface SendMessageParams {
   fromPhoneId: string;
+  /**
+   * Recipient: an E.164 phone number (e.g. "+1987654321") or a WhatsApp
+   * group JID (e.g. "120363043211234567@g.us") as returned by
+   * `groups.list()` or by the `groupId` of an inbound group message.
+   */
   to: string;
   content?: string;
   mediaUrls?: string[];
   idempotencyKey?: string;
+}
+
+export interface Group {
+  /** Full group JID (…@g.us) — pass as `to` in messages.send(). */
+  id: string;
+  name: string;
+  /** True for a community's announcement channel. */
+  isCommunityAnnounce: boolean;
+}
+
+export interface ListGroupsParams {
+  /** Sender phone (E.164 number or dashboard ID) whose groups to list. */
+  fromPhoneId: string;
 }
 
 export interface ListMessagesParams {
@@ -161,6 +183,8 @@ export interface MessageEventData {
   messageId: string;
   from: string;
   to: string;
+  isGroup: boolean;
+  groupId: string | null;
   status: MessageStatus;
   sentAt: string | null;
   deliveredAt: string | null;

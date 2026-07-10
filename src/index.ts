@@ -23,6 +23,8 @@ export type {
   InboundMessage,
   InboundMessageType,
   SendMessageParams,
+  Group,
+  ListGroupsParams,
   ListMessagesParams,
   ListInboundMessagesParams,
   PaginatedMessages,

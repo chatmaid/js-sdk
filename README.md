@@ -34,6 +34,20 @@ Use `sk_test_*` keys against the sandbox and `sk_live_*` keys against production
 
 `fromPhoneId` accepts either the E.164 number you registered (recommended) or its dashboard ID.
 
+## Sending to a group
+
+```ts
+const groups = await cm.groups.list({ fromPhoneId: "+15551234567" });
+
+await cm.messages.send({
+  fromPhoneId: "+15551234567",
+  to: groups[0].id, // full group JID, e.g. "120363043211234567@g.us"
+  content: "Team update: deploy completed.",
+});
+```
+
+`groups.list()` returns the groups the sender phone can post to. Inbound group messages carry the same JID in `groupId`, so you can reply to a group straight from a webhook payload.
+
 ## Sending media
 
 ```ts

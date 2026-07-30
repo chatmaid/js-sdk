@@ -7,6 +7,22 @@ export type MessageStatus =
   | "read"
   | "failed";
 
+/**
+ * Stable error codes returned on a failed message (in `errorCode`).
+ * Present when `status` is `"failed"`.
+ */
+export type MessageErrorCode =
+  | "NOT_CONNECTED"
+  | "INVALID_RECIPIENT"
+  | "RECIPIENT_NOT_REACHABLE"
+  | "NOT_GROUP_MEMBER"
+  | "RATE_LIMITED"
+  | "NOT_AUTHORIZED"
+  | "MEDIA_ERROR"
+  | "TIMEOUT"
+  | "SERVICE_UNAVAILABLE"
+  | "INTERNAL_ERROR";
+
 export interface Message {
   id: string;
   from: string;
@@ -18,7 +34,7 @@ export interface Message {
   content: string | null;
   mediaUrls: string[];
   status: MessageStatus;
-  errorCode: string | null;
+  errorCode: MessageErrorCode | null;
   errorMessage: string | null;
   createdAt: string;
   sentAt: string | null;
@@ -190,7 +206,7 @@ export interface MessageEventData {
   deliveredAt: string | null;
   readAt: string | null;
   failedAt: string | null;
-  errorCode?: string | null;
+  errorCode?: MessageErrorCode | null;
   errorMessage?: string | null;
 }
 

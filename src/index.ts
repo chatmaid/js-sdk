@@ -20,6 +20,7 @@ export type {
   Environment,
   Message,
   MessageStatus,
+  MessageErrorCode,
   InboundMessage,
   InboundMessageType,
   SendMessageParams,

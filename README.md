@@ -1,6 +1,6 @@
 # @chatmaid/sdk
 
-Official JavaScript / TypeScript SDK for the [Chatmaid Developers API](https://developers.chatmaid.net).
+Official JavaScript / TypeScript SDK for the [Chatmaid Developers API](https://www.chatmaid.net/developers).
 
 Send WhatsApp messages, look up phone numbers and account usage, and verify webhooks — typed end-to-end. Works in Node ≥18, modern browsers, Cloudflare Workers, Vercel Edge, Deno, and Bun. Zero runtime dependencies.
 
@@ -193,7 +193,7 @@ new Chatmaid({
 
 ## Documentation
 
-Full reference, error catalog, and recipes: [developers.chatmaid.net](https://developers.chatmaid.net/docs).
+Full reference, error catalog, and recipes: [chatmaid.net/docs](https://www.chatmaid.net/docs).
 
 ## License
 

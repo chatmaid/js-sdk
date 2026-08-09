@@ -128,6 +128,7 @@ function isWebhookEvent(value: unknown): value is WebhookEvent {
   if (typeof v.data !== "object" || v.data === null) return false;
   return (
     v.event === "message.sent" ||
+    v.event === "message.outgoing" ||
     v.event === "message.failed" ||
     v.event === "message.received" ||
     v.event === "message.delivered" ||

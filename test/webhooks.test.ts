@@ -43,6 +43,36 @@ describe("verifyWebhook", () => {
     }
   });
 
+  it("accepts a message.outgoing event and narrows to the manual source", () => {
+    const now = 1_700_000_000;
+    const body = JSON.stringify({
+      event: "message.outgoing",
+      timestamp: new Date(now * 1000).toISOString(),
+      data: {
+        from: "+1",
+        to: "+2",
+        content: "taking over from here",
+        type: "text",
+        isGroup: false,
+        groupId: null,
+        source: "manual",
+        sentAt: new Date(now * 1000).toISOString(),
+      },
+    });
+    const event = verifyWebhook({
+      body,
+      signature: sign(body, now),
+      secret: SECRET,
+      now: () => now * 1000,
+    });
+    expect(event.event).toBe("message.outgoing");
+    if (event.event === "message.outgoing") {
+      // The whole point of the event: a human, not the API, sent this.
+      expect(event.data.source).toBe("manual");
+      expect(event.data.content).toBe("taking over from here");
+    }
+  });
+
   it("accepts a message.received event", () => {
     const now = 1_700_000_000;
     const body = JSON.stringify({

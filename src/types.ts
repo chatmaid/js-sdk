@@ -182,6 +182,7 @@ export interface Usage {
 
 export type WebhookEventType =
   | "message.sent"
+  | "message.outgoing"
   | "message.failed"
   | "message.received"
   | "message.delivered"
@@ -202,12 +203,30 @@ export interface MessageEventData {
   isGroup: boolean;
   groupId: string | null;
   status: MessageStatus;
+  /** Always "api": these events describe messages issued through the API. */
+  source: "api";
   sentAt: string | null;
   deliveredAt: string | null;
   readAt: string | null;
   failedAt: string | null;
   errorCode?: MessageErrorCode | null;
   errorMessage?: string | null;
+}
+
+/**
+ * A message sent from the connected phone itself rather than through the
+ * API — i.e. typed by a human into WhatsApp. Carries no messageId because
+ * there is no API send to reference.
+ */
+export interface OutgoingMessageEventData {
+  from: string;
+  to: string;
+  content: string | null;
+  type: InboundMessageType;
+  isGroup: boolean;
+  groupId: string | null;
+  source: "manual";
+  sentAt: string;
 }
 
 export interface InboundMessageEventData {
@@ -232,6 +251,7 @@ export interface PhoneEventData {
 
 export type WebhookEvent =
   | WebhookEventBase<"message.sent", MessageEventData>
+  | WebhookEventBase<"message.outgoing", OutgoingMessageEventData>
   | WebhookEventBase<"message.failed", MessageEventData>
   | WebhookEventBase<"message.received", InboundMessageEventData>
   | WebhookEventBase<"message.delivered", MessageEventData>

@@ -240,6 +240,18 @@ export interface InboundMessageEventData {
   receivedAt: string;
 }
 
+/**
+ * Why a number stopped being connected.
+ *
+ * - `logged_out` - the device was unlinked from WhatsApp; re-link to recover.
+ * - `stream_replaced` - another session took over this number.
+ * - `offline` - the connection dropped and did not come back.
+ */
+export type PhoneDisconnectReason =
+  | "logged_out"
+  | "stream_replaced"
+  | "offline";
+
 export interface PhoneEventData {
   phoneId: string;
   phoneNumber: string;
@@ -247,6 +259,8 @@ export interface PhoneEventData {
   status: PhoneConnectionStatus;
   lastConnectedAt: string | null;
   lastDisconnectedAt: string | null;
+  /** Present on `phone.disconnected` only. */
+  reason?: PhoneDisconnectReason;
 }
 
 export type WebhookEvent =

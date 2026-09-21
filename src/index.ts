@@ -34,6 +34,7 @@ export type {
   PhoneNumber,
   PhoneNumberStatus,
   PhoneConnectionStatus,
+  PhoneDisconnectReason,
   Account,
   Usage,
   UsagePeriod,
